@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose")
 
 const UserSchema = mongoose.Schema({
     firstname: {
@@ -13,7 +13,7 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    city: {
+    town: {
         type: String,
         required: true
     },
@@ -25,7 +25,15 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    gender: {
+        type: String,
+        required: true
+    },
     date: {
+        type: Date,
+        default: Date.now
+    },
+    birthday: {
         type: Date,
         default: Date.now
     },
@@ -42,7 +50,7 @@ const UserSchema = mongoose.Schema({
         type: Number,
         default: 0
     }
-});
+})
 
-const User = mongoose.model("User", UserSchema);
-module.exports = User;
+const User = mongoose.model("User", UserSchema)
+module.exports = User

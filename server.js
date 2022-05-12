@@ -7,7 +7,7 @@ const morgan = require("morgan");
 const colors = require("colors");
 const flash = require("connect-flash");
 const session = require("express-session");
-const MongoStore = require("connect-mongo")(session);
+const MongoStore = require("connect-mongo");
 const passport = require("passport");
 
 dotenv.config({ path: "./config/config.env" });
@@ -32,7 +32,11 @@ app.use(session({
     secret: "secret",
     resave: true,
     saveUninitialized: true,
-    store: new MongoStore({ mongooseConnection: mongoose.connection })
+    store: MongoStore.create({
+        mongoUrl: process.env.MongoURI,
+        collectionName: 'sessions',
+        client: require("./modules/database")
+    })
 }));
 
 // Passport Middleware
