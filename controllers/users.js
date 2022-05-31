@@ -24,20 +24,21 @@ const getUsers = async (request, response) => {
         const adminUsers = allUsers.filter(user => user.role === "admin");
         return response.status(200).json({
             success: true,
+            message: `All ${ allUsers.length } Users Retrieved Successfully`,
             count: allUsers.length,
             data: {
                 allUsers,
                 adminUsers,
                 guestUsers
             }
-        });
+        })
     } catch (error) {
         return response.status(500).json({
             success: false,
             error: "Server Error"
-        });
+        })
     }
-};
+}
 
 
 // Handle Delete A User
@@ -64,13 +65,14 @@ const deleteUser = async (request, response) => {
     }
 };
 
-const deleteUsers = async (id) => {
-    const user = await User.findById(id);
-    await user.remove();
-};
 
 // Handle Delete A User
 const deleteAllUsers = async (request, response) => {
+    const deleteUsers = async (id) => {
+        const user = await User.findById(id);
+        await user.remove();
+    };
+
     try {
         const allUsers = await User.find();
         totalUsers = 0;
@@ -355,7 +357,7 @@ const resetPasswordPage = (request, response) => {
 
 
 // Register User
-const registerUser = (request, response) => {
+const registerUserActivate = (request, response) => {
     const { firstname, lastname, username, town, email, password, password2, gender, birthday } = request.body;
 
     if (password.trim() !== password2.trim()) {
@@ -505,6 +507,89 @@ const registerUser = (request, response) => {
     })
 }
 
+// Register User Without Activation
+const registerUser = (request, response) => {
+    const { firstname, lastname, username, town, email, password, password2, gender, birthday } = request.body;
+
+    if (password.trim() !== password2.trim()) {
+        console.log("Passwords Do Not Match")
+        return response.status(400).json({
+            success: false,
+            error: "Passwords Do Not Match"
+        })
+    }
+
+    if (password.length < 8) {
+        console.log("Passwords Should Be A Minimum of 8 Characters")
+        return response.status(400).json({
+            success: false,
+            error: "Passwords Should Be A Minimum of 8 Characters"
+        })
+    }
+
+    User.findOne({ username }).exec((error, user) => {
+        if (user) {
+            return response.status(400).json({ 
+                success: false, 
+                error: "User With This Username Already Exists"
+            })
+        } 
+    })
+
+    User.findOne({ email }).exec((error, user) => {
+        if (user) {
+            return response.status(400).json({ 
+                success: false, 
+                error: "User With This Email Already Exists"
+            });
+        } 
+        
+        // Hash Password
+        bcrypt.genSalt(10, (error, salt) => {
+            bcrypt.hash(password, salt, (error, hash) => {
+                if (error) {
+                    console.log("Hashing Password Error: ", error);
+                    return response.status(400).json({ 
+                        success: false, 
+                        error: "Hashing Password Error"
+                    });
+                }
+
+                // Set Password To Hashed 
+                const newUser = new User({
+                    firstname,
+                    lastname,
+                    username,
+                    town,
+                    email,
+                    password: hash,
+                    role: "guest",
+                    gender,
+                    birthday
+                })
+
+                // Save New User
+                newUser.save((error, success) => {
+                    if (error) {
+                        console.log("Error While Saving New User: ", error);
+                        return response.status(400).json({ 
+                            success: false, 
+                            error: "Error While Saving New User"
+                        });
+                    }
+
+                    console.log("Registeration Successfull, You Can Now Login");
+                    return response.status(200).json({ 
+                        success: true,
+                        message: "Registeration Successfull, You Can Now Login"
+                    })
+                })
+            })
+        })
+    })
+}
+
+
 // Forget Login Password
 const forgetPassword = (request, response) => {
     const { email } = request.body
@@ -619,7 +704,7 @@ const forgetPassword = (request, response) => {
 // Update User
 const updateUser = (request, response) => {
     const id = request.params.id
-    const { firstname, lastname, username, town, email, password, role, amountBalance, gender, birthday } = request.body
+    const { firstname, lastname, username, town, email, role, amountBalance, gender, birthday } = request.body
 
     User.findOne({ _id: id }, (error, user) => {
         if (error || !user) {
@@ -635,39 +720,29 @@ const updateUser = (request, response) => {
             username,
             town,
             email,
-            password,
             role,
             amountBalance,
             gender,
             birthday
         }
 
-        bcrypt.genSalt(10, (error, salt) => {
-            bcrypt.hash(updatedData.password, salt, (error, hash) => {
-                if (error) throw error;
-
-                // Set Password To Hashed
-                updatedData.password = hash;
-
-                // Update Password
-                user = _.extend(user, updatedData);
-                
-                user.save((error, result) => {
-                    if (error) {
-                        console.log("Update User Error");
-                        return response.status(403).json({
-                            success: false,
-                            error: "Update User Error"
-                        });
-                    } else {
-                        console.log(`User ${username.toUpperCase()} Has Been Updated Successfully`);
-                        return response.status(200).json({
-                            success: true,
-                            message: `User ${username.toUpperCase()} Has Been Updated Successfully`
-                        })
-                    }
+        // Update Password
+        user = _.extend(user, updatedData);
+        
+        user.save((error, result) => {
+            if (error) {
+                console.log("Update User Error");
+                return response.status(403).json({
+                    success: false,
+                    error: "Update User Error"
+                });
+            } else {
+                console.log(`User ${username.toUpperCase()} Has Been Updated Successfully`);
+                return response.status(200).json({
+                    success: true,
+                    message: `User ${username.toUpperCase()} Has Been Updated Successfully`
                 })
-            })
+            }
         })
     })
 }
@@ -752,10 +827,10 @@ const handleLogin = (request, response, next) => {
                 error
             });
         } else if (user) {
-            console.log(`User ${user.username.toUpperCase()} Authenticated Successfully`);
+            console.log(`User ${user.username.toUpperCase()} Logged In Successfully`);
             return response.status(200).json({
                 success: true,
-                message: `User ${user.username.toUpperCase()} Authenticated Successfully`,
+                message: `User ${user.username.toUpperCase()} Logged In Successfully`,
                 data: {
                     ..._.pick(user, ["firstname", "lastname", "email", "username", "role", "amountBalance"]),
                     token: generateUserLoginToken()
@@ -773,13 +848,13 @@ const handleLogin = (request, response, next) => {
 
 // Handle Log Out
 const handleLogOut = (request, response) => {
-    username = request.user.username
     request.logout()
     console.log("You Are Now Logged Out")
-    return response.status(200).json({
+    response.status(200).json({
         success: true,
         message: "You Are Now Logged Out"
     })
+    response.redirect("/login")
 }
 
 const depositAmount = (request, response) => {
@@ -789,7 +864,7 @@ const depositAmount = (request, response) => {
         console.log("Amount Should Not Be Less Than N100");
         return response.status(400).json({
             success: false,
-            message: "Amount Should Not Be Less Than N100"
+            error: "Amount Should Not Be Less Than N100"
         })
     }
 
@@ -879,6 +954,86 @@ const depositAmount = (request, response) => {
     })
 }
 
+// User Authentication
+const userAuthenticate = (request, response) => {
+    if (request.isAuthenticated()) {
+        return response.status(200).json({
+            success: true,
+            message: `User ${ request.username } Authenicated Successful`
+        })
+    }
+    return response.status(400).json({
+        success: false,
+        error: "User Authenication Failed, Please Log In"
+    })
+}
+
+// Contact Us
+const userContact = (request, response) => {
+    const { fullname, email, message }  = request.body
+
+    if (fullname === '' && email === '' && message === '') {
+        return response.status(400).json({
+            success: false,
+            error: "Please All Fields Are Required !!"
+        })
+    }
+
+    const subject = "Benion-Tech <Contact Us Message>"
+    const successMessage = `Dear ${fullname}, Your Message Has Been Sent To The Admin`
+    const errorMessage = "Contact Us Email Error"
+    const benionEmail = 'bernard.iorver28@gmail.com'
+    const html =  `
+        <div style="
+        color: rgb(18, 93, 40);
+        background-color: rgb(211, 240, 219);
+        border-color: rgb(193, 233, 205);
+        position: relative;
+        margin-bottom: 1rem;
+        padding: 0.75rem 1.25rem;
+        border-width: 1px;
+        border-style: solid;
+        border-image: initial;
+        border-radius: 0.25rem;
+        display: block;
+        box-sizing: border-box;
+        text-align: center;
+        ">
+            <h1 style="
+            color: inherit;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            margin-block-start: 0.67em;
+            margin-block-end: 0.67em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            font-weight: bold;
+            ">Benion-Tech</h1>
+            <h4 style="
+            color: inherit;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            margin-block-start: 1.33em;
+            margin-block-end: 1.33em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            font-weight: bold;
+            ">Contact Us Message Recieved</h4>
+            <hr>
+            <p>A message by ${fullname} was recieved with email address ${email}, with the message content below</p>
+            <hr>
+            <p><b>Name:   </b>${fullname}</p>
+            <p><b>Email:   </b>${email}</p>
+            <p><b>Message:   </b>${message}</p>
+            <hr>
+            <p>The user is expecting response from the admin</p>
+        </div>
+    `
+
+    sendEmail(response, subject, benionEmail, html, successMessage, errorMessage)
+}
 
 module.exports = {
     getUsers,
@@ -889,10 +1044,13 @@ module.exports = {
     passwordChange,
     resetPasswordPage,
     registerUser,
+    registerUserActivate,
     forgetPassword,
     updateUser,
     addUser,
     handleLogin,
     handleLogOut,
-    depositAmount
+    depositAmount,
+    userAuthenticate,
+    userContact
 }

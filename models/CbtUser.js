@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 
-const UserSchema = mongoose.Schema({
+const CbtUserSchema = mongoose.Schema({
     firstname: {
         type: String,
         required: true
@@ -13,11 +13,11 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    town: {
+    school: {
         type: String,
         required: true
     },
-    email: {
+    className: {
         type: String,
         required: true
     },
@@ -33,23 +33,31 @@ const UserSchema = mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    birthday: {
-        type: Date,
-        default: Date.now
+    accessCode: {
+        type: Number,
+        required: true
     },
-    resetToken: {
+    creator: {
+        type: Number,
+        required: true
+    },
+    activeExam: {
         type: String
     },
     role: {
         type: String,
-        default: "guest",
-        enum: ["admin", "guest"]
+        default: "student",
+        enum: ["admin", "student", "moderator"]
     },
-    amountBalance: {
-        type: Number,
-        default: 0
+    regType: {
+        type: String,
+        default: "self",
+        enum: ["add", "self"]
+    },
+    examTime: {
+        type: Number
     }
 })
 
-const User = mongoose.model("User", UserSchema)
-module.exports = User
+const CbtUser = mongoose.model("CbtUser", CbtUserSchema)
+module.exports = CbtUser

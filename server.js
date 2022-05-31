@@ -9,11 +9,29 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const passport = require("passport");
+const expressLayouts = require("express-ejs-layouts");
+const methodOverride = require("method-override");
 
 dotenv.config({ path: "./config/config.env" });
 
 // Passport Config
-require("./config/passport")(passport);
+const googleLoginAPI = "/auth/api/google-login"
+let google = false
+
+const pageUrl = (request, response, next) => {
+  const url = request.originalUrl;
+  if (url === googleLoginAPI) {
+    google = true
+  }
+  next()
+}
+app.use(pageUrl)
+
+if (!google) {
+    require("./config/passport")(passport)
+} else {
+    require("./config/passportGoogle")(passport)
+}
 
 // Cors
 app.use(cors());
@@ -50,10 +68,35 @@ app.use(flash());
 const connectDatabase = require("./modules/database");
 connectDatabase();
 
+// EJS
+app.use(expressLayouts);
+app.set("view engine", "ejs");
+
+// Global Variable
+app.use((request, response, next) => {
+    response.locals.success_message = request.flash("success_message");
+    response.locals.success_delete_message = request.flash("success_delete_message");
+    response.locals.error_message = request.flash("error_message");
+    response.locals.error = request.flash("error");
+    next();
+});
+
+// Method Override Middleware
+app.use(methodOverride(function(request, response) {
+    if (request.body && typeof request.body === "object" && "_method" in request.body) {
+        // look in urlencoded POST bodies and delete it
+        let method = request.body._method;
+        delete request.body._method;
+        return method;
+    }
+}));
+
 // Routes
-app.use("/benion-users", require("./routes/users"));
-app.use("/benion-news", require("./routes/news"));
-app.use("/page-not-found", require("./routes/not-found"));
+app.use("/auth", require("./routes/auth"))
+app.use("/benion-users", require("./routes/users"))
+app.use("/benion-cbt", require("./routes/cbt-users"))
+app.use("/benion-news", require("./routes/news"))
+app.use("/page-not-found", require("./routes/not-found"))
 
 // Use Static Folder
 if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "production") {
