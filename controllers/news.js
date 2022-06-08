@@ -1,496 +1,189 @@
-const firebaseDatabase = require("../config/firebase");
+const axios = require('axios')
 
-const handleHomepage = (request, response) => {
+const cryptoApiBaseUrl = process.env.CRYPTO_RAPIDAPI_URL
+const newsApibaseUrl = process.env.NEWS_API_URL
+
+const cryptoApiHeaders = {
+    'x-rapidapi-host': process.env.CRYPTO_RAPIDAPI_HOST,
+    'x-rapidapi-key': process.env.CRYPTO_RAPIDAPI_KEY
+}
+
+const newsApiHeaders = {
+    'x-bingapis-sdk': 'true',
+    'x-rapidapi-host': process.env.NEWS_API_HOST,
+    'x-rapidapi-key': process.env.NEWS_API_KEY
+}
+
+// Get All Cryptos
+const getCryptos = async (request, response) => {
+	let count;
+	if (request.body.count === undefined) {
+		count = 100
+	} else {
+		count = request.body.count
+	}
+
     try {
-        firebaseDatabase.ref("topStoriesNews").once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.render("main/homePage", {
-                    user: request.user,
-                    Data: Object.entries(snapshot.val()).reverse()
-                });
-                response.status(304);
-            } else {
-                response.render("main/homePage", {
-                    user: request.user,
-                    Data: []
-                });
-                response.status(400);
-            }
-        });
+        const cryptos = await axios({ url: `/coins?limit=${ count }`, method: 'get', baseURL: cryptoApiBaseUrl, headers: cryptoApiHeaders })
+        console.log(`All ${ cryptos.data.data.coins.length } Cryptos Fetched Successfully`)
+        return response.status(200).json({
+            success: true,
+            message: `All ${ cryptos.data.data.coins.length } Cryptos Fetched Successfully`,
+			count: cryptos.data.data.coins.length,
+            data: cryptos.data.data
+        })
     } catch (error) {
-        let errors = [];
-
-        errors.push({
-            message: "Server Error"
-        });
-
-        response.render("main/homePage", {
-            user: request.user,
-            errors,
-            topStories: Object.entries(snapshot.val()).reverse()
-        });
-        response.status(403);
-
-        console.log("Server Error: ", error);
-    }
-};
-
-const handleBenionNews = (request, response) => {
-    try {
-        firebaseDatabase.ref("topStoriesNews").once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.render("news/benionNews", {
-                    user: request.user,
-                    Data: Object.entries(snapshot.val()).reverse()
-                });
-                response.status(304);
-            } else {
-                response.render("news/benionNews", {
-                    user: request.user,
-                    Data: []
-                });
-                response.status(400);
-            }
-        });
-    } catch (error) {
-        let errors = [];
-
-        errors.push({
-            message: "Server Error"
-        });
-
-        response.render("news/benionNews", {
-            user: request.user,
-            errors,
-            topStories: Object.entries(snapshot.val()).reverse()
-        });
-        response.status(403);
-
-        console.log("Server Error: ", error);
-    }
-};
-
-const getAllTopStoriesNews = (request, response) => {
-    try {
-        firebaseDatabase.ref("topStoriesNews").once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.status(200).json({
-                    sucess: true,
-                    data: Object.entries(snapshot.val()).reverse()
-                });
-            } else {
-                response.status(400).json({
-                    sucess: false,
-                    data: []
-                });
-            }
-        });
-    } catch (error) {
-        response.status(500).json({
-            sucess: false,
-            error: "Server Error"
-        });
-
-        console.log("Server Error: ", error);
-    }
-};
-
-const getAllSportNews = (request, response) => {
-    try {
-        firebaseDatabase.ref("sportsNews").once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.status(200).json({
-                    sucess: true,
-                    data: Object.entries(snapshot.val()).reverse()
-                });
-            } else {
-                response.status(400).json({
-                    sucess: false,
-                    data: []
-                });
-            }
-        });
-    } catch (error) {
-        response.status(500).json({
-            sucess: false,
-            error: "Server Error"
-        });
-
-        console.log("Server Error: ", error);
-    }
-};
-
-const getAllTechnologyNews = (request, response) => {
-    try {
-        firebaseDatabase.ref("technologyNews").once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.status(200).json({
-                    sucess: true,
-                    data: Object.entries(snapshot.val()).reverse()
-                });
-            } else {
-                response.status(400).json({
-                    sucess: false,
-                    data: []
-                });
-            }
-        });
-    } catch (error) {
-        response.status(500).json({
-            sucess: false,
-            error: "Server Error"
-        });
-
-        console.log("Server Error: ", error);
-    }
-};
-
-const handleEntertainmentNews = (request, response) => {
-    try {
-        firebaseDatabase.ref("entertainmentNews").once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.render("news/entertainmentPage", {
-                    user: request.user,
-                    Data: Object.entries(snapshot.val()).reverse()
-                });
-                response.status(304);
-            } else {
-                response.render("news/entertainmentPage", {
-                    user: request.user,
-                    Data: []
-                });
-                response.status(400);
-            }
-        });
-    } catch (error) {
-        let errors = [];
-
-        errors.push({
-            message: "Server Error"
-        });
-
-        response.render("news/entertainmentPage", {
-            user: request.user,
-            errors,
-            topStories: Object.entries(snapshot.val()).reverse()
-        });
-        response.status(403);
-
-        console.log("Server Error: ", error);
-    }
-};
-
-const handleTechnologyNews = (request, response) => {
-    try {
-        firebaseDatabase.ref("technologyNews").once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.render("news/technologyPage", {
-                    user: request.user,
-                    Data: Object.entries(snapshot.val()).reverse()
-                });
-                response.status(304);
-            } else {
-                response.render("news/technologyPage", {
-                    user: request.user,
-                    Data: []
-                });
-                response.status(400);
-            }
-        });
-    } catch (error) {
-        let errors = [];
-
-        errors.push({
-            message: "Server Error"
-        });
-
-        response.render("news/technologyPage", {
-            user: request.user,
-            errors,
-            topStories: Object.entries(snapshot.val()).reverse()
-        });
-        response.status(403);
-
-        console.log("Server Error: ", error);
-    }
-};
-
-const handleSportNews = (request, response) => {
-    try {
-        firebaseDatabase.ref("sportsNews").once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.render("news/sportsPage", {
-                    user: request.user,
-                    Data: Object.entries(snapshot.val()).reverse()
-                });
-                response.status(304);
-            } else {
-                response.render("news/sportsPage", {
-                    user: request.user,
-                    Data: []
-                });
-                response.status(400);
-            }
-        });
-    } catch (error) {
-        let errors = [];
-
-        errors.push({
-            message: "Server Error"
-        });
-
-        response.render("news/sportsPage", {
-            user: request.user,
-            errors,
-            topStories: Object.entries(snapshot.val()).reverse()
-        });
-        response.status(403);
-
-        console.log("Server Error: ", error);
-    }
-};
-
-const getAllEntertainmentNews = (request, response) => {
-    try {
-        firebaseDatabase.ref("entertainmentNews").once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.status(200).json({
-                    sucess: true,
-                    data: Object.entries(snapshot.val()).reverse()
-                });
-            } else {
-                response.status(400).json({
-                    sucess: false,
-                    data: []
-                });
-            }
-        });
-    } catch (error) {
-        response.status(500).json({
-            sucess: false,
-            error: "Server Error"
-        });
-
-        console.log("Server Error: ", error);
-    }
-};
-
-const handleATopStoriesNews = (request, response) => {
-    try {
-        const key  = request.params.key;
-
-        firebaseDatabase.ref("topStoriesNews").child(key).once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.render("news/newsPage", {
-                    user: request.user,
-                    news: Object.values(snapshot.val())
-                });
-                response.status(304);
-            } else {
-                response.redirect("/page-not-found");
-                response.status(404);
-            }
-        });
-    } catch (error) {
-        response.redirect("/page-not-found");
-        response.status(404);
-        console.log("Server Error: ", error);
-    }
-};
-
-const handleAnEntertainmentNews = (request, response) => {
-    try {
-        const key  = request.params.key;
-
-        firebaseDatabase.ref("entertainmentNews").child(key).once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.render("news/entainmentNewsPage", {
-                    user: request.user,
-                    news: Object.values(snapshot.val())
-                });
-                response.status(304);
-            } else {
-                response.redirect("/page-not-found");
-                response.status(404);
-            }
-        });
-    } catch (error) {
-        response.redirect("/page-not-found");
-        response.status(404);
-        console.log("Server Error: ", error);
-    }
-};
-
-const handleATechnologyNews = (request, response) => {
-    try {
-        const key  = request.params.key;
-
-        firebaseDatabase.ref("technologyNews").child(key).once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.render("news/technologyNewsPage", {
-                    user: request.user,
-                    news: Object.values(snapshot.val())
-                });
-                response.status(304);
-            } else {
-                response.redirect("/page-not-found");
-                response.status(404);
-            }
-        });
-    } catch (error) {
-        response.redirect("/page-not-found");
-        response.status(404);
-        console.log("Server Error: ", error);
-    }
-};
-
-const handleASportNews = (request, response) => {
-    try {
-        const key  = request.params.key;
-
-        firebaseDatabase.ref("sportsNews").child(key).once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.render("news/sportsNewsPage", {
-                    user: request.user,
-                    news: Object.values(snapshot.val())
-                });
-                response.status(304);
-            } else {
-                response.redirect("/page-not-found");
-                response.status(404);
-            }
-        });
-    } catch (error) {
-        response.redirect("/page-not-found");
-        response.status(404);
-        console.log("Server Error: ", error);
-    }
-};
-
-const getATopStoriesNews = (request, response) => {
-    try {
-        const key  = request.params.key;
-
-        firebaseDatabase.ref("topStoriesNews").child(key).once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.status(200).json({
-                    success: true,
-                    data: Object.values(snapshot.val())
-                });
-            } else {
-                response.status(404).json({
-                    success: false,
-                    error: "Message With The Given Key Is Not Found"
-                });
-            }
-        });
-    } catch (error) {
-        response.status(500).json({
+        console.log(error)
+        return response.status(500).json({
             success: false,
             error: "Server Error"
-        });
-
-        console.log("Server Error: ", error);
+        })
     }
-};
+}
 
-const getAnEntertaimentNews = (request, response) => {
+// Get A Crypto
+const getCrypto = async (request, response) => {
+	let id
+	
+	if (request.params.id === undefined) {
+		id = "Qwsogvtv82FCd"
+	} else {
+		id = request.params.id
+	}
+
     try {
-        const key  = request.params.key;
-
-        firebaseDatabase.ref("entertainmentNews").child(key).once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.status(200).json({
-                    success: true,
-                    data: Object.values(snapshot.val())
-                });
-            } else {
-                response.status(404).json({
-                    success: false,
-                    error: "Message With The Given Key Is Not Found"
-                });
-            }
-        });
+        const crypto = await axios({ url: `/coin/${ id }`, method: 'get', baseURL: cryptoApiBaseUrl, headers: cryptoApiHeaders })
+        console.log(`Crypto (${ crypto.data.data.coin.name.toUpperCase() }) Fetched Successfully`)
+        return response.status(200).json({
+            success: true,
+            message: `Crypto (${ crypto.data.data.coin.name.toUpperCase() }) Fetched Successfully`,
+            data: crypto.data.data.coin
+        })
     } catch (error) {
-        response.status(500).json({
+        console.log(error)
+        return response.status(500).json({
             success: false,
             error: "Server Error"
-        });
-
-        console.log("Server Error: ", error);
+        })
     }
-};
+}
 
-const getASportNews = (request, response) => {
+// Get A Crypto History
+const getCryptoHistory = async (request, response) => {
+	let id
+	let timePeriod
+	
+	if (request.body.id === undefined) {
+		id = "Qwsogvtv82FCd"
+	} else {
+		id = request.body.id
+	}
+	
+	if (request.body.timePeriod === undefined) {
+		timePeriod = "7d"
+	} else {
+		timePeriod = request.body.timePeriod
+	}
+
     try {
-        const key  = request.params.key;
-
-        firebaseDatabase.ref("sportsNews").child(key).once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.status(200).json({
-                    success: true,
-                    data: Object.values(snapshot.val())
-                });
-            } else {
-                response.status(404).json({
-                    success: false,
-                    error: "Message With The Given Key Is Not Found"
-                });
-            }
-        });
+        const cryptoHistory = await axios({ url: `/coin/${ id }/history`, params: { timePeriod }, method: 'get', baseURL: cryptoApiBaseUrl, headers: cryptoApiHeaders })
+        console.log(`${ cryptoHistory.data.data.history.length } Crypto Histories Fetched Successfully`)
+        return response.status(200).json({
+            success: true,
+            message: `${ cryptoHistory.data.data.history.length } Crypto Histories Fetched Successfully`,
+            count: cryptoHistory.data.data.history.length,
+            data: cryptoHistory.data.data
+        })
     } catch (error) {
-        response.status(500).json({
+        console.log(error)
+        return response.status(500).json({
             success: false,
             error: "Server Error"
-        });
-
-        console.log("Server Error: ", error);
+        })
     }
-};
+}
 
-const getATechnologyNews = (request, response) => {
+// Get Crypto Exchanges
+const getCryptoExchanges = async (request, response) => {
     try {
-        const key  = request.params.key;
-
-        firebaseDatabase.ref("technologyNews").child(key).once("value", snapshot => {
-            if (snapshot.val() !== null) {
-                response.status(200).json({
-                    success: true,
-                    data: Object.values(snapshot.val())
-                });
-            } else {
-                response.status(404).json({
-                    success: false,
-                    error: "Message With The Given Key Is Not Found"
-                });
-            }
-        });
+        const cryptoExchanges = await axios({ url: "/exchanges", method: 'get', baseURL: cryptoApiBaseUrl, headers: cryptoApiHeaders })
+        console.log("Crypto Exchanges Fetched Successfully", cryptoExchanges)
+        return response.status(200).json({
+            success: true,
+            message: "Crypto Exchanges Fetched Successfully",
+            data: cryptoExchanges
+        })
     } catch (error) {
-        response.status(500).json({
+        console.log(error)
+        return response.status(500).json({
             success: false,
             error: "Server Error"
-        });
-
-        console.log("Server Error: ", error);
+        })
     }
-};
+}
+
+// Get All News
+const getBingNews = async (request, response) => {
+    const count = request.body.count
+    
+    try {
+        const news = await axios({ url: `/news?limit=${ count }`, method: 'get', baseURL: newsApibaseUrl, headers: newsApiHeaders })
+        console.log(`All ${ news.data.value.length } News Fetched Successfully`)
+        return response.status(200).json({
+            success: true,
+            message: `All ${ news.data.value.length } News Fetched Successfully`,
+            count: news.data.value.length,
+            data: news.data
+        })
+    } catch (error) {
+		console.log(error)
+        return response.status(500).json({
+            success: false,
+            error: "Server Error"
+        })
+    }
+}
+
+// Get All Crypto News
+const getCyptoNews = async (request, response) => {
+	let count
+	let newsCategory
+	
+	if (request.body.count === undefined) {
+		count = 100
+	} else {
+		count = request.body.count
+	}
+	
+	if (request.body.newsCategory === undefined) {
+		newsCategory = "crypto"
+	} else {
+		newsCategory = request.body.newsCategory
+	}
+	
+    try {
+        const cryptoNews = await axios({ url: `/news/search?q=${ newsCategory }&safeSearch=Off&textFormat=Raw&freshness=Day&count=${ count }`, method: 'get', baseURL: newsApibaseUrl, headers: newsApiHeaders })
+        console.log(`All ${ cryptoNews.data.value.length } Crypto News Fetched Successfully`)
+        return response.status(200).json({
+            success: true,
+            message: `All ${ cryptoNews.data.value.length } Crypto News Fetched Successfully`,
+            count: cryptoNews.data.value.length,
+            data: cryptoNews.data
+        })
+    } catch (error) {
+        console.log(error)
+        return response.status(500).json({
+            success: false,
+            error: "Server Error"
+        })
+    }
+}
 
 module.exports = {
-    getAllTopStoriesNews,
-    handleHomepage,
-    handleATopStoriesNews,
-    getAllEntertainmentNews,
-    handleEntertainmentNews,
-    handleAnEntertainmentNews,
-    getAnEntertaimentNews,
-    getAllSportNews,
-    handleSportNews,
-    getATopStoriesNews,
-    handleASportNews,
-    getASportNews,
-    getAllTechnologyNews,
-    handleTechnologyNews,
-    handleATechnologyNews,
-    getATechnologyNews,
-    handleBenionNews
-};
+    getCryptos,
+    getCrypto,
+    getCryptoHistory,
+    getCryptoExchanges,
+    getBingNews,
+    getCyptoNews
+}
