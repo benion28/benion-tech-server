@@ -13,6 +13,14 @@ const {
     updateCbtUserPassword
 } = require("../controllers/cbtUsers")
 
+const { 
+    getCbtExamData,
+    addExamQuestion,
+    editExamQuestion,
+    deleteExamQuestion,
+    getCbtExamQuestions
+} = require("../controllers/cbtExam")
+
 // Register A Cbt User
 router.route("/api/register")
 .post(registerCbtUser)
@@ -52,5 +60,28 @@ post(handleCbtLogin)
 // Update A Cbt User Password
 // router.put("/api/edit-user-password", ensureAdminAuthenticated, updateCbtUser)
 router.put("/api/edit-user-password", updateCbtUserPassword)
+
+
+// Get All Cbt Exam Data
+// router.get("/api/cbt-exam-data", ensureAdminAuthenticated, getCbtExamData)
+router.get("/api/cbt-exam-data", getCbtExamData)
+
+
+// Get All Cbt Exam Question
+// router.get("/api/cbt-exam-questions", ensureAdminAuthenticated, getCbtExamQuestions)
+router.get("/api/cbt-exam-questions", getCbtExamQuestions)
+
+
+// Update An Exam Question
+// router.put("/api/edit-question/:key", ensureAdminAuthenticated, updateCbtUser)
+router.put("/api/edit-question/:key", editExamQuestion)
+
+// Add An Exam Question
+router.route("/api/add-question")
+.post(addExamQuestion)
+
+// Delete An Exam Question
+// router.delete("/api/delete-question/:key", ensureAdminAuthenticated, deleteExamQuestion)
+router.delete("/api/delete-question/:key", deleteExamQuestion)
 
 module.exports = router
