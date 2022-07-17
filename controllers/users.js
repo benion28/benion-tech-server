@@ -1,19 +1,20 @@
-const { app } = require("../config/utils");
-const User = require("../models/User");
-const jwt = require("jsonwebtoken");
-const _ = require("lodash");
-const bcrypt = require("bcryptjs");
-const passport = require("passport");
-const { sendEmail } = require("./helpers");
+const { app } = require("../config/utils")
+const User = require("../models/User")
+const jwt = require("jsonwebtoken")
+const _ = require("lodash")
+const bcrypt = require("bcryptjs")
+const passport = require("passport")
+const { sendEmail } = require("./helpers")
+const firebaseDatabase = require("../config/firebase")
 
 
-let host;
+let host
 
 const pageHost = (request, response, next) => {
-    host = `${ request.protocol }://${ request.get("host") }`;
-    next();
+    host = `${ request.protocol }://${ request.get("host") }`
+    next()
 };
-app.use(pageHost);
+app.use(pageHost)
 
 
 // Handle Get Users
@@ -1031,6 +1032,22 @@ const userContact = (request, response) => {
             <p>The user is expecting response from the admin</p>
         </div>
     `
+    const date = new Date()
+    const object = {
+        fullname,
+        email,
+        message,
+        date: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`,
+        time: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+    }
+
+    firebaseDatabase.ref("contactMessages").push(object, error => {
+        if (error) {
+            console.log("User Contact Save Error", error)
+        } else {
+            console.log("User Contact Saved Successful")
+        }
+    })
 
     sendEmail(response, subject, benionEmail, html, successMessage, errorMessage)
 }

@@ -60,6 +60,9 @@ const CbtUserSchema = mongoose.Schema({
     },
     examTime: {
         type: Number
+    },
+    completed: {
+        type: Boolean
     }
 })
 

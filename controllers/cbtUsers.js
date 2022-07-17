@@ -376,7 +376,7 @@ const handleCbtLogin = (request, response) => {
             success: true,
             message: `Cbt User ${user.username.toUpperCase()} Logged In Successfully`,
             data: {
-                ..._.pick(user, ["firstname", "lastname", "className", "username", "role", "school", "accessCode", "regType", "activeExam", "examTime",]),
+                ..._.pick(user, ["firstname", "lastname", "className", "username", "category", "role", "school", "accessCode", "regType", "activeExam", "examTime", "completed"]),
                 token: generateUserLoginToken()
             }
         })

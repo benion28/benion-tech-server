@@ -18,7 +18,11 @@ const {
     addExamQuestion,
     editExamQuestion,
     deleteExamQuestion,
-    getCbtExamQuestions
+    getCbtExamQuestions,
+    editExamData,
+    addExamData,
+    deleteExamData,
+    testArea
 } = require("../controllers/cbtExam")
 
 // Register A Cbt User
@@ -32,6 +36,10 @@ router.route("/api/add-user")
 // Delete A Cbt User
 // router.delete("/api/delete-user/:id", ensureAdminAuthenticated, deleteCbtUser)
 router.delete("/api/delete-user/:id", deleteCbtUser)
+
+// Delete A Cbt Exam
+// router.delete("/api/delete-exam/:key", ensureAdminAuthenticated, deleteExamData)
+router.delete("/api/delete-exam/:key", deleteExamData)
 
 // Delete All Cbt Users
 // router.delete("/api/delete-all-user", ensureAdminAuthenticated, deleteAllCbtUsers)
@@ -61,10 +69,17 @@ post(handleCbtLogin)
 // router.put("/api/edit-user-password", ensureAdminAuthenticated, updateCbtUser)
 router.put("/api/edit-user-password", updateCbtUserPassword)
 
+// Update An Exam Data
+// router.put("/api/edit-exam", ensureAdminAuthenticated, editExamData)
+router.put("/api/edit-exam/:key", editExamData)
+
 
 // Get All Cbt Exam Data
 // router.get("/api/cbt-exam-data", ensureAdminAuthenticated, getCbtExamData)
 router.get("/api/cbt-exam-data", getCbtExamData)
+
+// Test Area
+router.get("/api/test-area", testArea)
 
 
 // Get All Cbt Exam Question
@@ -79,6 +94,10 @@ router.put("/api/edit-question/:key", editExamQuestion)
 // Add An Exam Question
 router.route("/api/add-question")
 .post(addExamQuestion)
+
+// Add An Exam Data
+router.route("/api/add-exam")
+.post(addExamData)
 
 // Delete An Exam Question
 // router.delete("/api/delete-question/:key", ensureAdminAuthenticated, deleteExamQuestion)

@@ -1,4 +1,6 @@
+const _ = require("lodash")
 const firebaseDatabase = require("../config/firebase")
+const CbtUser = require("../models/CbtUser")
 
 // Get All Cbt Exam Data
 const getCbtExamData = (request, response) => {
@@ -145,12 +147,122 @@ const addExamQuestion = (request, response) => {
     })
 }
 
+// Add Exam Data
+const testArea = (request, response) => {
+    console.log("Test Area Empty")
+}
+
+// Add Exam Data
+const addExamData = (request, response) => {
+    const { id, examTime, username, answered, answers, completed, timeLimit, score } = request.body
+
+    const object = {
+        id,
+        examTime,
+        username,
+        answered,
+        answers,
+        completed,
+        timeLimit,
+		score
+    }
+
+    firebaseDatabase.ref("cbtExams").push(object, error => {
+        if (error) {
+            console.log("Add Exam Data Error", error)
+            return response.status(500).json({ 
+                success: false,
+                error: "Add Exam Data Error"
+            })
+        } else {
+            firebaseDatabase.ref("cbtExams").once("value", snapshot => {
+                if (snapshot.val() !== null) {
+                    cbtExams =  []
+                    exams = Object.values(snapshot.val())
+                    keys = Object.keys(snapshot.val())
+
+                    for (let index = 0; index < exams.length; index++) {
+                        cbtExams.push({
+                            ...exams[index],
+                            $key: keys[index]
+                        })
+                    }
+                    const examData = cbtExams.filter(item => item.id === id)
+                    CbtUser.findOne({ username }).exec((error, user) => {
+                        if (error || !user) {
+                            return response.status(400).json({ 
+                                success: false, 
+                                error: "User With This Username Don't Exists"
+                            })
+                        }
+                        const updatedData = {
+                            activeExam: id,
+                            completed
+                        }
+                        user = _.extend(user, updatedData)
+                        user.save((error, result) => {
+                            if (error) {
+                                console.log("Update Cbt User Exam Error");
+                                return response.status(400).json({
+                                    success: false,
+                                    error: "Update Cbt User Exam Error"
+                                });
+                            } else {
+                                console.log("Add Exam Data Successfull")
+                                return response.status(200).json({ 
+                                    success: true,
+                                    message: "Add Exam Data Successfull",
+                                    data: examData[0]
+                                })
+                            }
+                        })
+                    })
+                } else {
+                    console.log("Add Exam Data Error")
+                    return response.status(500).json({ 
+                        success: true,
+                        message: "Add Exam Data Error",
+                        data: {
+                            $key: null,
+                            category: null,
+                            id: null,
+                            className: null,
+                            examTime: 1,
+                            subject: null,
+                            username: null,
+                            answered: '',
+                            answers: '',
+                            term: null,
+                            completed: true
+                        }
+                    })
+                }
+            })
+        }
+    })
+}
+
 // Edit Exam Question
 const editExamQuestion = (request, response) => {
     const { question, optionA, optionB, optionC, optionD, answer, category, className, subject, term, creator } = request.body
     const key = request.params.key
 
     const object = {
+        question,
+        optionA,
+        optionB,
+        optionC,
+        optionD,
+        answer,
+        category,
+        className,
+        subject,
+        term,
+        creator
+    }
+
+    const data = {
+        $key: request.params.key,
         question,
         optionA,
         optionB,
@@ -175,7 +287,77 @@ const editExamQuestion = (request, response) => {
             console.log("Edit Exam Question Successfull")
             return response.status(200).json({ 
                 success: true,
-                message: "Edit Exam Question Successfull"
+                message: "Edit Exam Question Successfull",
+                data
+            })
+        }
+    })
+}
+
+// Edit Exam Data
+const editExamData = (request, response) => {
+    const key = request.params.key
+    const { id, examTime, username, answered, answers, completed, timeLimit, score } = request.body
+
+    const object = {
+        id,
+        examTime,
+        username,
+        answered,
+        answers,
+        completed,
+        timeLimit,
+		score
+    }
+
+    const data = {
+        $key: request.params.key,
+        id,
+        examTime,
+        username,
+        answered,
+        answers,
+        completed,
+        timeLimit,
+		score
+    }
+
+    firebaseDatabase.ref(`cbtExam/${key}`).set(object, error => {
+        if (error) {
+            console.log("Edit Exam Data Error", error)
+            return response.status(500).json({ 
+                success: false,
+                message: "Edit Exam Data Error"
+            })
+        } else {
+            CbtUser.findOne({ username }).exec((error, user) => {
+                if (error || !user) {
+                    return response.status(400).json({ 
+                        success: false, 
+                        error: "User With This Username Don't Exists"
+                    })
+                }
+                const updatedData = {
+                    activeExam: id,
+                    completed
+                }
+                user = _.extend(user, updatedData)
+                user.save((error, result) => {
+                    if (error) {
+                        console.log("Update Cbt User Exam Error");
+                        return response.status(400).json({
+                            success: false,
+                            error: "Update Cbt User Exam Error"
+                        });
+                    } else {
+                        console.log("Edit Exam Data Successfull")
+                        return response.status(200).json({ 
+                            success: true,
+                            message: "Edit Exam Data Successfull",
+                            data
+                        })
+                    }
+                })
             })
         }
     })
@@ -202,10 +384,35 @@ const deleteExamQuestion = (request, response) => {
     })
 }
 
+// Delete Exam Data
+const deleteExamData = (request, response) => {
+    const key = request.params.key
+
+    firebaseDatabase.ref(`cbtExam/${key}`).remove(error => {
+        if (error) {
+            console.log("Delete Exam Data Error", error)
+            return response.status(500).json({ 
+                success: false,
+                message: "Delete Exam Data Error"
+            })
+        } else {
+            console.log("Delete Exam Data Successfull")
+            return response.status(200).json({ 
+                success: true,
+                message: "Delete Exam Data Successfull"
+            })
+        }
+    })
+}
+
 module.exports = {
     getCbtExamData,
     addExamQuestion,
     editExamQuestion,
     deleteExamQuestion,
-    getCbtExamQuestions
+    getCbtExamQuestions,
+    addExamData,
+    deleteExamData,
+    editExamData,
+    testArea
 }
