@@ -18,7 +18,9 @@ const {
     handleLogOut,
     depositAmount,
     userAuthenticate,
-    userContact
+    userContact,
+    deleteContactMessage,
+    getContactMessages
 } = require("../controllers/users")
 
 // Users Dashboard
@@ -56,12 +58,20 @@ router.put("/api/deposit-for-user", depositAmount)
 // router.get("/api/users", ensureAdminAuthenticated, getUsers)
 router.get("/api/users", getUsers)
 
+// Get All Contact Messages
+// router.get("/api/contact-messages", ensureAdminAuthenticated, getContactMessages)
+router.get("/api/contact-messages", getContactMessages)
+
 // Check User's Authentication
 router.get("/api/authenticate", userAuthenticate)
 
 // Delete A User
 // router.delete("/api/delete-user/:id", ensureAdminAuthenticated, deleteUser)
 router.delete("/api/delete-user/:id", deleteUser)
+
+// Delete A Contact Message
+// router.delete("/api/delete-contact-message/:key", ensureAdminAuthenticated, deleteContactMessage)
+router.delete("/api/delete-contact-message/:key", deleteContactMessage)
 
 // Delete All Users
 // router.delete("/api/delete-all-user", ensureAdminAuthenticated, deleteAllUsers)

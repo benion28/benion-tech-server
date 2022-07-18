@@ -1052,6 +1052,81 @@ const userContact = (request, response) => {
     sendEmail(response, subject, benionEmail, html, successMessage, errorMessage)
 }
 
+// Delete Contact Message
+const deleteContactMessage = (request, response) => {
+    const key = request.params.key
+
+    firebaseDatabase.ref(`contactMessages/${key}`).remove(error => {
+        if (error) {
+            console.log("Delete Contact Message Error", error)
+            return response.status(500).json({ 
+                success: false,
+                message: "Delete Contact Message Error"
+            })
+        } else {
+            console.log("Delete Contact Message Successfull")
+            return response.status(200).json({ 
+                success: true,
+                message: "Delete Contact Message Successfull"
+            })
+        }
+    })
+}
+
+// Get All Contact Messages
+const getContactMessages = (request, response) => {
+	try {
+        let contactMessages = []
+
+        firebaseDatabase.ref("contactMessages").once("value", snapshot => {
+            if (snapshot.val() !== null) {
+                contactMessages =  []
+                messages = Object.values(snapshot.val())
+                keys = Object.keys(snapshot.val())
+
+                for (let index = 0; index < messages.length; index++) {
+                    contactMessages.push({
+                        ...messages[index],
+                        $key: keys[index]
+                    })
+                }
+
+                console.log(`All ${messages.length} Contact Messages Fetched Successfully`)
+                return response.status(200).json({
+                    success: true,
+                    message: `All ${messages.length} Contact Messages Fetched Successfully`,
+                    count: messages.length,
+                    data: [
+                        keys,
+                        messages,
+                        snapshot.val(),
+                        contactMessages.reverse()
+                    ]
+                })
+            } else {
+                console.log("No Contact Message Fetched Successfully")
+                return response.status(200).json({
+                    success: true,
+                    message: "No Contact Message Fetched Successfully",
+                    count: contactMessages.length,
+                    data: [
+                        [],
+                        [],
+                        {},
+                        contactMessages
+                    ]
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        return response.status(500).json({
+            success: false,
+            error: "Server Error"
+        })
+    }
+}
+
 module.exports = {
     getUsers,
     deleteUser,
@@ -1069,5 +1144,7 @@ module.exports = {
     handleLogOut,
     depositAmount,
     userAuthenticate,
-    userContact
+    userContact,
+    deleteContactMessage,
+    getContactMessages
 }

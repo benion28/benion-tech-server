@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.817b938f.css",
-    "main.js": "/static/js/main.308e5d11.js",
+    "main.css": "/static/css/main.4d04bb5c.css",
+    "main.js": "/static/js/main.317ecc80.js",
     "static/media/benion-tech-icon.png": "/static/media/benion-tech-icon.4aa74b7a55e04e2ac6ca.png",
     "static/media/benion-passport.jpg": "/static/media/benion-passport.9d56c6e2bddbde9397f8.jpg",
     "static/media/helvetica-neu.ttf": "/static/media/helvetica-neu.8a19678078a6b21c8057.ttf",
@@ -10,11 +10,11 @@
     "static/media/CoolveticaRg-Regular.woff": "/static/media/CoolveticaRg-Regular.8307bfa187bccdc55f4d.woff",
     "static/media/CoolveticaRg-Regular.woff2": "/static/media/CoolveticaRg-Regular.7d1f3b1dd46ad6557a17.woff2",
     "index.html": "/index.html",
-    "main.817b938f.css.map": "/static/css/main.817b938f.css.map",
-    "main.308e5d11.js.map": "/static/js/main.308e5d11.js.map"
+    "main.4d04bb5c.css.map": "/static/css/main.4d04bb5c.css.map",
+    "main.317ecc80.js.map": "/static/js/main.317ecc80.js.map"
   },
   "entrypoints": [
-    "static/css/main.817b938f.css",
-    "static/js/main.308e5d11.js"
+    "static/css/main.4d04bb5c.css",
+    "static/js/main.317ecc80.js"
   ]
 }

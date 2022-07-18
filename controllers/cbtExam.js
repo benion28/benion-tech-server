@@ -233,7 +233,8 @@ const addExamData = (request, response) => {
                             answered: '',
                             answers: '',
                             term: null,
-                            completed: true
+                            completed: true,
+                            score: 0
                         }
                     })
                 }
