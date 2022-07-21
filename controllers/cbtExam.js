@@ -154,7 +154,7 @@ const testArea = (request, response) => {
 
 // Add Exam Data
 const addExamData = (request, response) => {
-    const { id, examTime, username, answered, answers, completed, timeLimit, score } = request.body
+    const { id, examTime, username, answered, answers, completed, timeLimit, score, subject, term, className, category } = request.body
 
     const object = {
         id,
@@ -164,7 +164,11 @@ const addExamData = (request, response) => {
         answers,
         completed,
         timeLimit,
-		score
+		score,
+		subject,
+        term,
+        className,
+        category
     }
 
     firebaseDatabase.ref("cbtExams").push(object, error => {
@@ -298,7 +302,7 @@ const editExamQuestion = (request, response) => {
 // Edit Exam Data
 const editExamData = (request, response) => {
     const key = request.params.key
-    const { id, examTime, username, answered, answers, completed, timeLimit, score } = request.body
+    const { id, examTime, username, answered, answers, completed, timeLimit, score, subject, term, className, category } = request.body
 
     const object = {
         id,
@@ -308,7 +312,11 @@ const editExamData = (request, response) => {
         answers,
         completed,
         timeLimit,
-		score
+		score,
+		subject,
+        term,
+        className,
+        category
     }
 
     const data = {
@@ -320,7 +328,11 @@ const editExamData = (request, response) => {
         answers,
         completed,
         timeLimit,
-		score
+		score,
+		subject,
+        term,
+        className,
+        category
     }
 
     firebaseDatabase.ref(`cbtExam/${key}`).set(object, error => {

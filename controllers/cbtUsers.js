@@ -385,7 +385,23 @@ const handleCbtLogin = (request, response) => {
 
 // Update Cbt User Password
 const updateCbtUserPassword = (request, response) => {
-    const { username, password } = request.body
+    const { username, password, password2 } = request.body
+
+    if (password.trim() !== password2.trim()) {
+        console.log("Passwords Do Not Match");
+        return response.status(400).json({
+            success: false,
+            error: "Passwords Do Not Match"
+        })
+    }
+
+    if (password.length < 8) {
+        console.log("Passwords Should Be A Minimum of 8 Characters")
+        return response.status(400).json({
+            success: false,
+            error: "Passwords Should Be A Minimum of 8 Characters"
+        })
+    }
 
     CbtUser.findOne({ username }).exec((error, user) => {
         if (error || !user) {

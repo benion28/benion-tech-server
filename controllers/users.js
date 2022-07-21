@@ -100,7 +100,7 @@ const activatePage = (request, response) => {
     const token = request.params.token;
 
     if (token) {
-        jwt.verify(token, process.env.JWT_ACTIVATE_SECRET_USERS, async (error, decodedToken) => {
+        jwt.verify(token, process.env.JWT_ACTIVATE_SECRET_USERS, (error, decodedToken) => {
             if (error) {
                 response.status(400).json({
                     success: false,
@@ -167,7 +167,7 @@ const activateUser = (request, response) => {
     const token = request.body.token
 
     if (token) {
-        jwt.verify(token, process.env.JWT_ACTIVATE_SECRET_USERS, async (error, decodedToken) => {
+        jwt.verify(token, process.env.JWT_ACTIVATE_SECRET_USERS, (error, decodedToken) => {
             if (error) {
                 console.log("Incorrect Or Expired Token", error);
                 return response.status(400).json({
@@ -306,6 +306,68 @@ const passwordChange = (request, response) => {
         })
     }
 };
+
+// Handle Password Update
+const updatePassword = (request, response) => {
+    const { username, password, password2 } = request.body
+
+    if (password.trim() !== password2.trim()) {
+        console.log("Passwords Do Not Match");
+        return response.status(400).json({
+            success: false,
+            error: "Passwords Do Not Match"
+        })
+    }
+
+    if (password.length < 8) {
+        console.log("Passwords Should Be A Minimum of 8 Characters")
+        return response.status(400).json({
+            success: false,
+            error: "Passwords Should Be A Minimum of 8 Characters"
+        })
+    }
+
+    User.findOne({ username }, (error, user) => {
+        if (error || !user) {
+            return response.status(401).json({ 
+                success: false, 
+                error: "User With The Given Username Doesn't Exist" 
+            });
+        }
+
+        const updatedPassword = {
+            password
+        }
+
+        bcrypt.genSalt(10, (error, salt) => {
+            bcrypt.hash(updatedPassword.password, salt, (error, hash) => {
+                if (error) {
+                    console.log("Encrypting Password Error: ", error)
+                }
+
+                // Set Password To Hashed
+                updatedPassword.password = hash
+
+                // Update Password
+                user = _.extend(user, updatedPassword)
+
+                user.save((error, result) => {
+                    if (error) {
+                        return response.status(400).json({ 
+                            success: false, 
+                            error: "Update Password Error" 
+                        })
+                    } else {
+                        return response.status(200).json({ 
+                            success: true, 
+                            message: "Password Has Been Updated Successfully" 
+                        })
+                    }
+                })
+            })
+        })
+    })
+}
 
 
 // Reset Login User Page
@@ -869,6 +931,14 @@ const depositAmount = (request, response) => {
         })
     }
 
+    if (typeof(amount) !== 'number') {
+        console.log("Amount Should Be A Valid Number");
+        return response.status(400).json({
+            success: false,
+            error: "Amount Should Be A Valid Number"
+        })
+    }
+
     User.findOne({ username }).exec((error, user) => {
         if (!user) {
             console.log("No Corresponding User Found With The Username")
@@ -1037,8 +1107,8 @@ const userContact = (request, response) => {
         fullname,
         email,
         message,
-        date: `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`,
-        time: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`
+        date: `${date.toLocaleDateString()}`,
+        time: `${date.toLocaleTimeString()}`
     }
 
     firebaseDatabase.ref("contactMessages").push(object, error => {
@@ -1134,6 +1204,7 @@ module.exports = {
     activatePage,
     activateUser,
     passwordChange,
+    updatePassword,
     resetPasswordPage,
     registerUser,
     registerUserActivate,

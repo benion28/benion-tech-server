@@ -8,6 +8,7 @@ const {
     activatePage,
     activateUser,
     passwordChange,
+    updatePassword,
     resetPasswordPage,
     registerUser,
     registerUserActivate,
@@ -29,6 +30,10 @@ router.get("/dashboard", ensureAuthenticated)
 // Change Password
 router.route("/api/change-password/:token")
 .put(passwordChange)
+
+// Update Password
+// router.put("/api/update-password", ensureAdminAuthenticated, updatePassword)
+router.put("/api/update-password", updatePassword)
 
 // Activate A User
 // router.post("/api/activate-email", ensureAdminAuthenticated, activateUser)
