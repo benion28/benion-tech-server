@@ -19,10 +19,14 @@ const {
     editExamQuestion,
     deleteExamQuestion,
     getCbtExamQuestions,
-    editExamData,
     addExamData,
     deleteExamData,
-    testArea
+    editExamData,
+    testArea,
+    deleteScore,
+    getScores,
+    addScore,
+    editScore
 } = require("../controllers/cbtExam")
 
 // Register A Cbt User
@@ -86,14 +90,25 @@ router.get("/api/test-area", testArea)
 // router.get("/api/cbt-exam-questions", ensureAdminAuthenticated, getCbtExamQuestions)
 router.get("/api/cbt-exam-questions", getCbtExamQuestions)
 
+// Get All Cbt Scores
+// router.get("/api/cbt-scores", ensureAdminAuthenticated, getCbtExamQuestions)
+router.get("/api/cbt-scores", getScores)
 
 // Update An Exam Question
 // router.put("/api/edit-question/:key", ensureAdminAuthenticated, updateCbtUser)
 router.put("/api/edit-question/:key", editExamQuestion)
 
+// Update A Cbt Score
+// router.put("/api/edit-cbt-score/:key", ensureAdminAuthenticated, updateCbtUser)
+router.put("/api/edit-cbt-score/:key", editScore)
+
 // Add An Exam Question
 router.route("/api/add-question")
 .post(addExamQuestion)
+
+// Add A Cbt Score
+router.route("/api/add-cbt-score")
+.post(addScore)
 
 // Add An Exam Data
 router.route("/api/add-exam")
@@ -102,5 +117,9 @@ router.route("/api/add-exam")
 // Delete An Exam Question
 // router.delete("/api/delete-question/:key", ensureAdminAuthenticated, deleteExamQuestion)
 router.delete("/api/delete-question/:key", deleteExamQuestion)
+
+// Delete A Cbt Score
+// router.delete("/api/delete-cbt-score/:key", ensureAdminAuthenticated, deleteExamQuestion)
+router.delete("/api/delete-cbt-score/:key", deleteScore)
 
 module.exports = router

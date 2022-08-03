@@ -294,10 +294,11 @@ const findCbtUsername = async (request, response) => {
     const roleFilter = allCbtUsers.filter(user => user.role === role)
     const classFilter = roleFilter.filter(user => user.className === className)
     const schoolFilter = classFilter.filter(user => user.school === school)
-    const lastnameFilter = schoolFilter.filter(user => user.lastname === lastname)
-    const firstnameFilter = lastnameFilter.filter(user => user.firstname === firstname)
+    const lastnameFilter = schoolFilter.filter(user => user.lastname.trim() === lastname.trim())
+    const firstnameFilter = lastnameFilter.filter(user => user.firstname.trim() === firstname.trim())
+    const foundUser = firstnameFilter
 
-    if (firstnameFilter.length < 1) {
+    if (foundUser.length < 1) {
         console.log("No Cbt User Was Found With The Given Details")
         return response.status(400).json({
             success: false, 
@@ -308,8 +309,8 @@ const findCbtUsername = async (request, response) => {
     console.log("No Cbt User Was Found With The Given Details")
     return response.status(200).json({
         success: true, 
-        message: "A Cbt User Was Found With The Given Details",
-        data: firstnameFilter[0]
+        message: `A Cbt User Was Found With The Username (${foundUser[0].username})`,
+        data: foundUser[0]
     })
 }
 
@@ -357,27 +358,27 @@ const handleCbtLogin = (request, response) => {
                     success: false, 
                     error: "Incorrect Password"
                 })
-            } 
-        })
+            } else {
+                // Generate Token
+                const generateUserLoginToken = () => {
+                    const userData = {
+                        id: user._id,
+                        username: user.username,
+                        role: user.role
+                    }
 
-        // Generate Toke
-        const generateUserLoginToken = () => {
-            const userData = {
-                id: user._id,
-                username: user.username,
-                role: user.role
-            }
+                    return jwt.sign(userData, process.env.JWT_LOGIN_SECRET_USERS, { expiresIn: "59m" })
+                }
 
-            return jwt.sign(userData, process.env.JWT_LOGIN_SECRET_USERS, { expiresIn: "59m" })
-        }
-
-        console.log(`Cbt User ${user.username.toUpperCase()} Logged In Successfully`);
-        return response.status(200).json({
-            success: true,
-            message: `Cbt User ${user.username.toUpperCase()} Logged In Successfully`,
-            data: {
-                ..._.pick(user, ["firstname", "lastname", "className", "username", "category", "role", "school", "accessCode", "regType", "activeExam", "examTime", "completed"]),
-                token: generateUserLoginToken()
+                console.log(`Cbt User ${user.username.toUpperCase()} Logged In Successfully`);
+                return response.status(200).json({
+                    success: true,
+                    message: `Cbt User ${user.username.toUpperCase()} Logged In Successfully`,
+                    data: {
+                        ..._.pick(user, ["firstname", "lastname", "className", "username", "category", "role", "school", "accessCode", "regType", "activeExam", "examTime", "completed"]),
+                        token: generateUserLoginToken()
+                    }
+                })
             }
         })
     })
