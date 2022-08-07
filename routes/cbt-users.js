@@ -57,10 +57,6 @@ router.put("/api/edit-user/:id", updateCbtUser)
 // router.get("/api/users", ensureAdminAuthenticated, getCbtUsers)
 router.get("/api/users", getCbtUsers)
 
-// Get Cbt Usersname
-// router.get("/api/find-username", ensureAdminAuthenticated, findCbtUsername)
-router.get("/api/find-username", findCbtUsername)
-
 // Handle Cbt User Logout
 router.route("/api/logout").
 get(handleCbtLogOut)
@@ -68,6 +64,10 @@ get(handleCbtLogOut)
 // Handle Cbt User Login
 router.route("/api/login").
 post(handleCbtLogin)
+
+// Get Cbt Usersname
+router.route("/api/find-username").
+post(findCbtUsername)
 
 // Update A Cbt User Password
 // router.put("/api/edit-user-password", ensureAdminAuthenticated, updateCbtUser)

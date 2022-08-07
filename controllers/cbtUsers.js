@@ -306,7 +306,7 @@ const findCbtUsername = async (request, response) => {
         })
     }
 
-    console.log("No Cbt User Was Found With The Given Details")
+    console.log(`A Cbt User Was Found With The Username (${foundUser[0].username})`)
     return response.status(200).json({
         success: true, 
         message: `A Cbt User Was Found With The Username (${foundUser[0].username})`,

@@ -10,21 +10,26 @@ const {
 } = require("../controllers/news")
 
 // Get All Cryptos
-router.get("/api/all-cryptos", getCryptos)
+router.route("/api/all-cryptos").
+post(getCryptos)
 
 // Get A Crypto
-router.get("/api/crypto/:id", getCrypto)
+router.route("/api/crypto/:id").
+post(getCrypto)
 
 // Get A Crypto History
-router.get("/api/crypto-history", getCryptoHistory)
+router.route("/api/crypto-history").
+post(getCryptoHistory)
 
 // Get Crypto Exchanges
 router.get("/api/crypto-exchanges", getCryptoExchanges)
 
 // Get Bing News
-router.get("/api/bing-news", getBingNews)
+router.route("/api/bing-news").
+post(getBingNews)
 
 // Get Crypto News
-router.get("/api/crypto-news", getCyptoNews)
+router.route("/api/crypto-news").
+post(getCyptoNews)
 
 module.exports = router
