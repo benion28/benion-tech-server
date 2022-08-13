@@ -1197,6 +1197,151 @@ const getContactMessages = (request, response) => {
     }
 }
 
+// Get Images
+const getImages = (request, response) => {
+	try {
+        let galleryImages = []
+
+        firebaseDatabase.ref("galleryImages").once("value", snapshot => {
+            if (snapshot.val() !== null) {
+                galleryImages =  []
+                images = Object.values(snapshot.val())
+                keys = Object.keys(snapshot.val())
+
+                for (let index = 0; index < images.length; index++) {
+                    galleryImages.push({
+                        ...images[index],
+                        $key: keys[index]
+                    })
+                }
+
+                console.log(`All ${images.length} Gallery Images Fetched Successfully`)
+                return response.status(200).json({
+                    success: true,
+                    message: `All ${images.length} Gallery Images Fetched Successfully`,
+                    count: images.length,
+                    data: [
+                        keys,
+                        images,
+                        snapshot.val(),
+                        galleryImages.reverse()
+                    ]
+                })
+            } else {
+                console.log("No GalleryImages Fetched Successfully")
+                return response.status(200).json({
+                    success: true,
+                    message: "No Gallery Images Fetched Successfully",
+                    count: galleryImages.length,
+                    data: [
+                        [],
+                        [],
+                        {},
+                        galleryImages
+                    ]
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        return response.status(500).json({
+            success: false,
+            error: "Server Error"
+        })
+    }
+}
+
+// Add An Image
+const addImage = (request, response) => {
+    const { tag, image, caption, link, category } = request.body
+
+    const object = {
+        tag,
+        image,
+        caption,
+        link,
+        category
+    }
+
+    firebaseDatabase.ref("galleryImages").push(object, error => {
+        if (error) {
+            console.log("Add Image Error", error)
+            return response.status(500).json({ 
+                success: false,
+                message: "Add Image Error"
+            })
+        } else {
+            console.log("Add Image Successfull")
+            return response.status(200).json({ 
+                success: true,
+                message: "Add Image Successfull",
+                data: object
+            })
+        }
+    })
+}
+
+// Edit Image
+const editImage = (request, response) => {
+    const { tag, image, caption, link, category } = request.body
+    const key = request.params.key
+
+    const object = {
+        tag,
+        image,
+        caption,
+        link,
+        category
+    }
+
+    const data = {
+        $key: request.params.key,
+        tag,
+        image,
+        caption,
+        link,
+        category
+    }
+
+    firebaseDatabase.ref(`galleryImages/${key}`).set(object, error => {
+        if (error) {
+            console.log("Edit Image Error", error)
+            return response.status(500).json({ 
+                success: false,
+                message: "Edit Image Error"
+            })
+        } else {
+            console.log("Edit Image Successfull")
+            return response.status(200).json({ 
+                success: true,
+                message: "Edit Image Successfull",
+                data
+            })
+        }
+    })
+}
+
+// Delete Image
+const deleteImage = (request, response) => {
+    const key = request.params.key
+
+    firebaseDatabase.ref(`galleryImages/${key}`).remove(error => {
+        if (error) {
+            console.log("Delete Image Error", error)
+            return response.status(500).json({ 
+                success: false,
+                message: "Delete Image Error"
+            })
+        } else {
+            console.log("Delete Image Successfull")
+            return response.status(200).json({ 
+                success: true,
+                message: "Delete Image Successfull"
+            })
+        }
+    })
+}
+
 module.exports = {
     getUsers,
     deleteUser,
@@ -1217,5 +1362,9 @@ module.exports = {
     userAuthenticate,
     userContact,
     deleteContactMessage,
-    getContactMessages
+    getContactMessages,
+    getImages, 
+    addImage, 
+    editImage, 
+    deleteImage
 }

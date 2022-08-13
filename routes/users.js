@@ -21,7 +21,11 @@ const {
     userAuthenticate,
     userContact,
     deleteContactMessage,
-    getContactMessages
+    getContactMessages, 
+    getImages, 
+    addImage, 
+    editImage, 
+    deleteImage
 } = require("../controllers/users")
 
 // Users Dashboard
@@ -114,5 +118,21 @@ router.get("/reset-password-link/:token", resetPasswordPage)
 
 // Handle Change Password
 router.put("/change-password/:token", passwordChange)
+
+// Get All Images
+// router.get("/api/all-images", ensureAdminAuthenticated, getImages)
+router.get("/api/all-images", getImages)
+
+// Update An Image
+// router.put("/api/edit-image/:key", ensureAdminAuthenticated, editImage)
+router.put("/api/edit-image/:key", editImage)
+
+// Add An Image
+router.route("/api/add-image")
+.post(addImage)
+
+// Delete An Image
+// router.delete("/api/delete-image/:key", ensureAdminAuthenticated, deleteImage)
+router.delete("/api/delete-image/:key", deleteImage)
 
 module.exports = router

@@ -147,9 +147,9 @@ const addExamQuestion = (request, response) => {
     })
 }
 
-// Add Exam Data
+// Test Area
 const testArea = (request, response) => {
-    console.log("Test Area Empty")
+	console.log("Test Area")
 }
 
 // Add Exam Data

@@ -249,10 +249,10 @@ const updateCbtUser = (request, response) => {
                     error: "Update Cbt User Error"
                 });
             } else {
-                console.log(`User ${username.toUpperCase()} Has Been Updated Successfully`);
+                console.log(`User (${firstname} ${lastname}) Has Been Updated Successfully`);
                 return response.status(200).json({
                     success: true,
-                    message: `User ${firstname.toUpperCase()}(${username}) Has Been Updated Successfully`
+                    message: `User (${firstname} ${lastname}) Has Been Updated Successfully`
                 })
             }
         })
