@@ -179,11 +179,160 @@ const getCyptoNews = async (request, response) => {
     }
 }
 
+// Get Posts
+const getPosts = (request, response) => {
+	try {
+        let allPosts = []
+
+        firebaseDatabase.ref("posts").once("value", snapshot => {
+            if (snapshot.val() !== null) {
+                allPosts =  []
+                posts = Object.values(snapshot.val())
+                keys = Object.keys(snapshot.val())
+
+                for (let index = 0; index < posts.length; index++) {
+                    allPosts.push({
+                        ...posts[index],
+                        $key: keys[index]
+                    })
+                }
+
+                console.log(`All ${posts.length} Posts Fetched Successfully`)
+                return response.status(200).json({
+                    success: true,
+                    message: `All ${posts.length} Posts Fetched Successfully`,
+                    count: posts.length,
+                    data: [
+                        keys,
+                        posts,
+                        snapshot.val(),
+                        allPosts.reverse()
+                    ]
+                })
+            } else {
+                console.log("Posts Fetched Successfully")
+                return response.status(200).json({
+                    success: true,
+                    message: "Posts Fetched Successfully",
+                    count: allPosts.length,
+                    data: [
+                        [],
+                        [],
+                        {},
+                        allPosts
+                    ]
+                })
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        return response.status(500).json({
+            success: false,
+            error: "Server Error"
+        })
+    }
+}
+
+// Add An Post
+const addPost = (request, response) => {
+    const { tag, image, title, content, category } = request.body
+
+    const object = {
+        tag,
+        image,
+        title,
+        content,
+        category
+    }
+
+    firebaseDatabase.ref("posts").push(object, error => {
+        if (error) {
+            console.log("Add Post Error", error)
+            return response.status(500).json({ 
+                success: false,
+                message: "Add Post Error"
+            })
+        } else {
+            console.log("Add Post Successfull")
+            return response.status(200).json({ 
+                success: true,
+                message: "Add Post Successfull",
+                data: object
+            })
+        }
+    })
+}
+
+// Edit Post
+const editPost = (request, response) => {
+    const { tag, image, title, content, category } = request.body
+    const key = request.params.key
+
+    const object = {
+        tag,
+        image,
+        title,
+        content,
+        category
+    }
+
+    const data = {
+        $key: request.params.key,
+        tag,
+        image,
+        title,
+        content,
+        category
+    }
+
+    firebaseDatabase.ref(`posts/${key}`).set(object, error => {
+        if (error) {
+            console.log("Edit Post Error", error)
+            return response.status(500).json({ 
+                success: false,
+                message: "Edit Post Error"
+            })
+        } else {
+            console.log("Edit Post Successfull")
+            return response.status(200).json({ 
+                success: true,
+                message: "Edit Post Successfull",
+                data
+            })
+        }
+    })
+}
+
+// Delete Post
+const deletePost = (request, response) => {
+    const key = request.params.key
+
+    firebaseDatabase.ref(`posts/${key}`).remove(error => {
+        if (error) {
+            console.log("Delete Post Error", error)
+            return response.status(500).json({ 
+                success: false,
+                message: "Delete Post Error"
+            })
+        } else {
+            console.log("Delete Post Successfull")
+            return response.status(200).json({ 
+                success: true,
+                message: "Delete Post Successfull"
+            })
+        }
+    })
+}
+
 module.exports = {
     getCryptos,
     getCrypto,
     getCryptoHistory,
     getCryptoExchanges,
     getBingNews,
-    getCyptoNews
+    getCyptoNews,
+    getPosts, 
+    addPost, 
+    editPost, 
+    deletePost
 }
