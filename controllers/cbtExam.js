@@ -149,7 +149,14 @@ const addExamQuestion = (request, response) => {
 
 // Test Area
 const testArea = (request, response) => {
-	console.log("Test Area")
+	const { name, email, message, title } = request.body
+    const data = { name, email, message, title }
+    console.log("Test Area Data Recieved", data)
+    return response.status(200).json({ 
+        success: true,
+        message: "Test Area Data Recieved",
+        data
+    })
 }
 
 // Add Exam Data

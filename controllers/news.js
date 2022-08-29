@@ -1,4 +1,5 @@
 const axios = require('axios')
+const firebaseDatabase = require("../config/firebase")
 
 const cryptoApiBaseUrl = process.env.CRYPTO_RAPIDAPI_URL
 const newsApibaseUrl = process.env.NEWS_API_URL
@@ -235,14 +236,17 @@ const getPosts = (request, response) => {
 
 // Add An Post
 const addPost = (request, response) => {
-    const { tag, image, title, content, category } = request.body
+    const { tag, image, title, content, category, caption, creator, date } = request.body
 
     const object = {
         tag,
         image,
         title,
         content,
-        category
+        category,
+        caption,
+        creator,
+        date
     }
 
     firebaseDatabase.ref("posts").push(object, error => {
@@ -265,7 +269,7 @@ const addPost = (request, response) => {
 
 // Edit Post
 const editPost = (request, response) => {
-    const { tag, image, title, content, category } = request.body
+    const { tag, image, title, content, category, caption, creator, date } = request.body
     const key = request.params.key
 
     const object = {
@@ -273,7 +277,10 @@ const editPost = (request, response) => {
         image,
         title,
         content,
-        category
+        category,
+        caption,
+        creator,
+        date
     }
 
     const data = {
@@ -282,7 +289,10 @@ const editPost = (request, response) => {
         image,
         title,
         content,
-        category
+        category,
+        caption,
+        creator,
+        date
     }
 
     firebaseDatabase.ref(`posts/${key}`).set(object, error => {
