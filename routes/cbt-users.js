@@ -83,7 +83,8 @@ router.put("/api/edit-exam/:key", editExamData)
 router.get("/api/cbt-exam-data", getCbtExamData)
 
 // Test Area
-router.get("/api/test-area", testArea)
+router.route("/api/test-area")
+.post(testArea)
 
 
 // Get All Cbt Exam Question
