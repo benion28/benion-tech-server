@@ -1,5 +1,6 @@
 const { app } = require("../config/utils")
 const User = require("../models/User")
+const GoogleUser = require("../models/GoogleUser")
 const jwt = require("jsonwebtoken")
 const _ = require("lodash")
 const bcrypt = require("bcryptjs")
@@ -41,6 +42,29 @@ const getUsers = async (request, response) => {
     }
 }
 
+// Handle Get Google Users
+const getGoogleUsers = async (request, response) => {
+    try {
+        const allGoogleUsers = await GoogleUser.find();
+        const guestGoogleUsers = allGoogleUsers.filter(user => user.role === "guest");
+        const adminGoogleUsers = allGoogleUsers.filter(user => user.role === "admin");
+        return response.status(200).json({
+            success: true,
+            message: `All ${ allGoogleUsers.length } Google Users Retrieved Successfully`,
+            count: allGoogleUsers.length,
+            data: {
+                allGoogleUsers,
+                guestGoogleUsers,
+                adminGoogleUsers
+            }
+        })
+    } catch (error) {
+        return response.status(500).json({
+            success: false,
+            error: "Server Error"
+        })
+    }
+}
 
 // Handle Delete A User
 const deleteUser = async (request, response) => {
@@ -66,8 +90,33 @@ const deleteUser = async (request, response) => {
     }
 };
 
+// Handle Delete A Google User
+const deleteGoogleUser = async (request, response) => {
+    const id = request.params.id;
+    try {
+        const user = await GoogleUser.findById(id);
+        if (!user) {
+            return response.status(404).json({
+                success: false,
+                error: "Google User Not Found"
+            });
+        }
+        await user.remove();
+        return response.status(200).json({
+            success: true,
+            message: `Google User ${ user.username } Deleted Successful`
+        });
+    } catch (error) {
+        return response.status(500).json({
+            success: false,
+            error: "Server Error"
+        });
+    }
+};
 
-// Handle Delete A User
+
+
+// Handle Delete All User
 const deleteAllUsers = async (request, response) => {
     const deleteUsers = async (id) => {
         const user = await User.findById(id);
@@ -85,6 +134,33 @@ const deleteAllUsers = async (request, response) => {
         return response.status(200).json({
             success: true,
             message: `${ totalUsers } Users Deleted Successful`
+        });
+    } catch (error) {
+        return response.status(500).json({
+            success: false,
+            error: "Server Error"
+        });
+    }
+};
+
+// Handle Delete All User
+const deleteAllGoogleUsers = async (request, response) => {
+    const deleteUsers = async (id) => {
+        const user = await GoogleUser.findById(id);
+        await user.remove();
+    };
+
+    try {
+        const allGoogleUsers = await GoogleUser.find();
+        totalUsers = 0;
+
+        allGoogleUsers.forEach(object => {
+            deleteUsers(object._id);
+            totalUsers += 1;
+        });
+        return response.status(200).json({
+            success: true,
+            message: `${ totalUsers } Google Users Deleted Successful`
         });
     } catch (error) {
         return response.status(500).json({
@@ -767,7 +843,7 @@ const forgetPassword = (request, response) => {
 // Update User
 const updateUser = (request, response) => {
     const id = request.params.id
-    const { firstname, lastname, username, town, email, role, amountBalance, gender, birthday } = request.body
+    const { firstname, lastname, username, town, email, role, amountBalance, gender, birthday, profile, job } = request.body
 
     User.findOne({ _id: id }, (error, user) => {
         if (error || !user) {
@@ -786,7 +862,9 @@ const updateUser = (request, response) => {
             role,
             amountBalance,
             gender,
-            birthday
+            birthday,
+            profile: profile ? profile : '',
+            job: job ? job : ''
         }
 
         // Update Password
@@ -804,6 +882,50 @@ const updateUser = (request, response) => {
                 return response.status(200).json({
                     success: true,
                     message: `User ${username.toUpperCase()} Has Been Updated Successfully`
+                })
+            }
+        })
+    })
+}
+
+// Update User
+const updateGoogleUser = (request, response) => {
+    const id = request.params.id
+    const { firstname, lastname, username, role, amountBalance, profile, job } = request.body
+
+    GoogleUser.findOne({ _id: id }, (error, user) => {
+        if (error || !user) {
+            return response.status(403).json({
+                success: false, 
+                error: "Google User  With The Given ID Doesn't Exist" 
+            })
+        }
+
+        const updatedData = {
+            firstname, 
+            lastname, 
+            username, 
+            role, 
+            amountBalance,
+            profile: profile ? profile : '',
+            job: job ? job : ''
+        }
+
+        // Update Password
+        user = _.extend(user, updatedData);
+        
+        user.save((error, result) => {
+            if (error) {
+                console.log("Update Google User Error");
+                return response.status(403).json({
+                    success: false,
+                    error: "Update Google User Error"
+                });
+            } else {
+                console.log(`Google User ${username.toUpperCase()} Has Been Updated Successfully`);
+                return response.status(200).json({
+                    success: true,
+                    message: `Google User ${username.toUpperCase()} Has Been Updated Successfully`
                 })
             }
         })
@@ -1366,5 +1488,9 @@ module.exports = {
     getImages, 
     addImage, 
     editImage, 
-    deleteImage
+    deleteImage,
+    getGoogleUsers,
+    deleteGoogleUser,
+    deleteAllGoogleUsers,
+    updateGoogleUser
 }

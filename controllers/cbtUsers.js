@@ -259,6 +259,69 @@ const updateCbtUser = (request, response) => {
     })
 }
 
+// Update Cbt User
+const promoteCbtUser = async (request, response) => {
+    const { school, futureClass, currentClass,  role} = request.body
+    const roleFilter = await CbtUser.find().filter(user => user.role === role)
+    const schoolFilter = await roleFilter.filter(user => user.school === school)
+    const allCbtUsers = schoolFilter.filter(user => user.className === currentClass)
+    let promoteError = {
+        status: false,
+        message: ""
+    }
+    const promote = (student) => {
+        const id = student._id
+        CbtUser.findOne({ _id: id }, (error, user) => {
+            if (error || !user) {
+                console.log("Cbt User  With The Given ID Doesn't Exist")
+                promoteError = {
+                    status: true,
+                    message: "Cbt User  With The Given ID Doesn't Exist"
+                }
+            }
+    
+            const updatedData = {
+                className: futureClass
+            }
+    
+            // Update Password
+            user = _.extend(user, updatedData);
+            
+            user.save((error, result) => {
+                if (error) {
+                    console.log("Update Cbt User Error")
+                    promoteError = {
+                        status: true,
+                        message: "Update Cbt User Error"
+                    }
+                } else {
+                    console.log(`User (${firstname} ${lastname}) Has Been Updated Successfully`)
+                    promoteError = {
+                        status: false,
+                        message: `User (${firstname} ${lastname}) Has Been Updated Successfully`
+                    }
+                }
+            })
+        })
+    }
+
+    allCbtUsers.forEach(student => {
+        promoteCbtUser(student)
+    })
+
+    if (promoteError.status) {
+        return response.status(400).json({
+            success: promoteError.status,
+            message: promoteError.message
+        })
+    } else {
+        return response.status(200).json({
+            success: promoteError.status,
+            message: promoteError.message
+        })
+    }
+}
+
 // Handle Get Users
 const getCbtUsers = async (request, response) => {
     try {
@@ -461,5 +524,6 @@ module.exports = {
     addCbtUser,
     handleCbtLogin,
     handleCbtLogOut,
-    updateCbtUserPassword
+    updateCbtUserPassword,
+    promoteCbtUser
 }

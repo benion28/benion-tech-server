@@ -10,7 +10,8 @@ const {
     addCbtUser,
     handleCbtLogin,
     handleCbtLogOut,
-    updateCbtUserPassword
+    updateCbtUserPassword,
+    promoteCbtUser
 } = require("../controllers/cbtUsers")
 
 const { 
@@ -52,6 +53,10 @@ router.delete("/api/delete-all-user", deleteAllCbtUsers)
 // Update A Cbt User
 // router.put("/api/edit-user/:id", ensureAdminAuthenticated, updateCbtUser)
 router.put("/api/edit-user/:id", updateCbtUser)
+
+// Promote Cbt Users
+// router.put("/api/promote-users", ensureAdminAuthenticated, promoteCbtUser)
+router.put("/api/promote-users", promoteCbtUser)
 
 // Get All Cbt Users
 // router.get("/api/users", ensureAdminAuthenticated, getCbtUsers)

@@ -25,7 +25,11 @@ const {
     getImages, 
     addImage, 
     editImage, 
-    deleteImage
+    deleteImage,
+    getGoogleUsers,
+    deleteGoogleUser,
+    deleteAllGoogleUsers,
+    updateGoogleUser
 } = require("../controllers/users")
 
 // Users Dashboard
@@ -67,6 +71,10 @@ router.put("/api/deposit-for-user", depositAmount)
 // router.get("/api/users", ensureAdminAuthenticated, getUsers)
 router.get("/api/users", getUsers)
 
+// Get All Google Users
+router.get("/api/google-users", getGoogleUsers)
+
+
 // Get All Contact Messages
 // router.get("/api/contact-messages", ensureAdminAuthenticated, getContactMessages)
 router.get("/api/contact-messages", getContactMessages)
@@ -78,17 +86,26 @@ router.get("/api/authenticate", userAuthenticate)
 // router.delete("/api/delete-user/:id", ensureAdminAuthenticated, deleteUser)
 router.delete("/api/delete-user/:id", deleteUser)
 
+// Delete A Google User
+router.delete("/api/delete-google-user/:id", deleteGoogleUser)
+
 // Delete A Contact Message
 // router.delete("/api/delete-contact-message/:key", ensureAdminAuthenticated, deleteContactMessage)
 router.delete("/api/delete-contact-message/:key", deleteContactMessage)
 
 // Delete All Users
 // router.delete("/api/delete-all-user", ensureAdminAuthenticated, deleteAllUsers)
-router.delete("/api/delete-all-user", deleteAllUsers)
+router.delete("/api/delete-all-users", deleteAllUsers)
+
+// Delete All Google Users
+router.delete("/api/delete-all-goole-users", deleteAllGoogleUsers)
 
 // Update A User
 // router.put("/api/edit-user/:id", ensureAdminAuthenticated, updateUser)
 router.put("/api/edit-user/:id", updateUser)
+
+// Update A Google User
+router.put("/api/edit-google-user/:id", updateGoogleUser)
 
 // Add User
 // router.post("/api/add-user", ensureAdminAuthenticated, addUser)

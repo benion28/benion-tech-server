@@ -48,6 +48,14 @@ const UserSchema = mongoose.Schema({
     amountBalance: {
         type: Number,
         default: 0
+    },
+    profile: {
+        type: String,
+        default: ""
+    },
+    job: {
+        type: String,
+        default: "Student"
     }
 })
 
