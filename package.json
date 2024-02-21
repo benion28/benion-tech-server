@@ -37,6 +37,7 @@
     "moment": "^2.29.3",
     "mongoose": "^6.3.0",
     "morgan": "^1.10.0",
+    "node-telegram-bot-api": "^0.64.0",
     "passport": "^0.5.2",
     "passport-google-oauth2": "^0.2.0",
     "passport-google-oauth20": "^2.0.0",

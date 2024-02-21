@@ -639,8 +639,17 @@ const registerUserActivate = (request, response) => {
                         <p>If you didn't do this just ignore as link expires in 24 hours</p>
                     </div>
                 `
+                const message = `
+                    Action Required Within 24 Hours !!!
+
+                    copy the link below to your browser or you can click on this link below to activate the account
+
+                    ${ href }
+
+                    If you didn't do this just ignore as link expires in 24 hours
+                `
         
-                sendEmail(response, subject, userData.email, html, successMessage, errorMessage)
+                sendEmail(response, subject, userData.email, html, successMessage, errorMessage, message)
             })
         })
     })
@@ -827,6 +836,18 @@ const forgetPassword = (request, response) => {
             </div>
         `
 
+        const message = `
+            Action Required Within 30 Minutes !!!
+
+            There was an attempt to reset an account's password with this email ${ userData.email }, if it was you
+
+            copy the link below to your browser or you can click on this link below to reset password for the account
+
+            ${ href }
+
+            If you didn't do this just ignore as link expires in 30 minutes
+        `
+
         return user.updateOne({resetToken: token }, (error, success) => {
             if (error || !user) {
                 return response.status(401).json({ 
@@ -834,7 +855,7 @@ const forgetPassword = (request, response) => {
                     error: "Reset Password Link Error" 
                 })
             } else {
-                sendEmail(response, subject, userData.email, html, successMessage, errorMessage)
+                sendEmail(response, subject, userData.email, html, successMessage, errorMessage, message)
             }
         })
     })
@@ -1140,8 +1161,21 @@ const depositAmount = (request, response) => {
                         <p>The amount should reflect in your dashboard balance within 30 minutes</p>
                     </div>
                 `
+
+                const message = `
+                    Account Credit Alert Successful !!!
+
+                    A Deposit was made for the account with this email ${ user.email }, if it was you just ignore the message
+
+                    Amount:   N${amount}
+                    Reference:   Deposited By Admin --${request.username}
+                    Previous Balance:   N${previousBalance}
+                    Current Balance:   N${currentBalance}
+
+                    The amount should reflect in your dashboard balance within 30 minutes
+                `
         
-                sendEmail(response, subject, user.email, html, successMessage, errorMessage)
+                sendEmail(response, subject, user.email, html, successMessage, errorMessage, message)
             }
         })
     })
@@ -1224,6 +1258,18 @@ const userContact = (request, response) => {
             <p>The user is expecting response from the admin</p>
         </div>
     `
+
+    const telegramMessage = `
+        Contact Us Message Recieved !!!
+        
+        A message by ${fullname} was recieved with email address ${email}, with the message content below
+        
+        Name:   ${fullname}
+        Email:   ${email}
+        Message:   ${message}
+        
+        The user is expecting response from the admin
+    `
     const date = new Date()
     const object = {
         fullname,
@@ -1241,7 +1287,7 @@ const userContact = (request, response) => {
         }
     })
 
-    sendEmail(response, subject, benionEmail, html, successMessage, errorMessage)
+    sendEmail(response, subject, benionEmail, html, successMessage, errorMessage, telegramMessage)
 }
 
 // Delete Contact Message
