@@ -30,6 +30,22 @@ const {
     editScore
 } = require("../controllers/cbtExam")
 
+const { 
+    getUtmeExamData,
+    addUtmeExamQuestion,
+    editUtmeExamQuestion,
+    deleteUtmeExamQuestion,
+    getUtmeExamQuestions,
+    addUtmeExamData,
+    deleteUtmeExamData,
+    editUtmeExamData,
+    fetchUtmeQuestions,
+    deleteUtmeScore,
+    getUtmeScores,
+    addUtmeScore,
+    editUtmeScore
+} = require("../controllers/utmeExam")
+
 // Register A Cbt User
 router.route("/api/register")
 .post(registerCbtUser)
@@ -127,5 +143,49 @@ router.delete("/api/delete-question/:key", deleteExamQuestion)
 // Delete A Cbt Score
 // router.delete("/api/delete-cbt-score/:key", ensureAdminAuthenticated, deleteExamQuestion)
 router.delete("/api/delete-cbt-score/:key", deleteScore)
+
+
+//----------------------------------- Utme Exam ------------------------------------------------------//
+// Get All Utme Exam Data
+router.get("/api/utme-exam-data", getUtmeExamData)
+
+// Add A Utme Exam Question
+router.route("/api/add-utme-question")
+.post(addUtmeExamQuestion)
+
+// Update A Utme Exam Question
+router.put("/api/edit-utme-question/:key", editUtmeExamQuestion)
+
+// Delete A Utme Exam Question
+router.delete("/api/delete-utme-question/:key", deleteUtmeExamQuestion)
+
+// Get All Utme Exam Question
+router.get("/api/utme-exam-questions", getUtmeExamQuestions)
+
+// Add A Utme Exam Data
+router.route("/api/add-utme-exam")
+.post(addUtmeExamData)
+
+// Delete A Utme Exam
+router.delete("/api/delete-utme-exam/:key", deleteUtmeExamData)
+
+// Update A Utme Exam Data
+router.put("/api/edit-utme-exam/:key", editUtmeExamData)
+
+// Delete A Utme Score
+router.delete("/api/delete-utme-score/:key", deleteUtmeScore)
+
+// Get All Utme Scores
+router.get("/api/utme-scores", getUtmeScores)
+
+// Add A Utme Score
+router.route("/api/add-utme-score")
+.post(addUtmeScore)
+
+// Update A Utme Score
+router.put("/api/edit-utme-score/:key", editUtmeScore)
+
+// Fetch Utme Questions
+router.get("/api/utme-fetch-data", fetchUtmeQuestions)
 
 module.exports = router

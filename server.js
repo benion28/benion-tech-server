@@ -1,6 +1,5 @@
 const path = require("path");
 const { express, app, server } = require("./config/utils");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
@@ -94,6 +93,7 @@ app.use(methodOverride(function(request, response) {
 // Routes
 app.use("/auth", require("./routes/auth"))
 app.use("/benion-users", require("./routes/users"))
+app.use("/benion-payments", require("./routes/payments"))
 app.use("/benion-cbt", require("./routes/cbt-users"))
 app.use("/benion-news", require("./routes/news"))
 app.use("/page-not-found", require("./routes/not-found"))
